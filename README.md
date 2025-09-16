@@ -68,7 +68,6 @@ The data warehouse enables answering critical business questions through optimiz
 Parcial 3/
 ├── README.md
 ├── scripts/
-│   └── dogs.py
 ├── documentation/
 ├── schemas/
 ├── screenshots/
