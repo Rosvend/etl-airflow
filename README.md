@@ -1,77 +1,157 @@
-# ETL Pipeline Data Warehouse Project
+# Retail Sales Data Warehouse ETL Pipeline
 
-A comprehensive data engineering project implementing an end-to-end ETL pipeline for business intelligence and analytics.
+This project demonstrates a complete data warehouse solution built around retail sales data, implementing a star schema design with automated ETL processes. The solution transforms raw transactional data into a structured analytical environment optimized for business intelligence queries.
 
-## Project Overview
+## Dataset Description
 
-This project demonstrates the complete lifecycle of a data warehouse solution, from source system analysis to business intelligence queries. The implementation follows industry best practices for data warehousing and ETL processes.
+**Source**: Retail Sales Dataset (`retail_sales_dataset.csv`)
+- **Records**: 1,000+ transaction records
+- **Timeframe**: 2023 retail transactions
+- **Format**: CSV with semicolon delimiter
 
-## 🎯 Project Objectives
+**Data Structure**:
+- `Transaction ID`: Unique transaction identifier
+- `Date`: Transaction date (DD/MM/YYYY format)
+- `Customer ID`: Customer identifier (CUST001-CUSTXXX)
+- `Gender`: Customer gender (Male/Female)
+- `Age`: Customer age
+- `Product Category`: Product classification (Beauty, Clothing, Electronics)
+- `Quantity`: Items purchased
+- `Price per Unit`: Unit price
+- `Total Amount`: Transaction total
 
-### 1. Source System Analysis
-- **Dataset Identification**: Comprehensive analysis of the source dataset
-- **Entity Mapping**: Documentation of columns, entities, and their relationships
-- **Business Value**: Justification of data utility for analytical purposes
+## Data Warehouse Architecture
 
-### 2. Data Warehouse Design
-- **Schema Architecture**: Implementation of star or snowflake schema design
-- **Fact Table**: Central table containing measurable business metrics
-- **Dimension Tables**: Supporting tables providing context and attributes
-- **Relationship Mapping**: Clear documentation of table relationships and foreign keys
+### Star Schema Design
+The implementation follows a **star schema** pattern optimized for analytical queries:
 
-### 3. ETL Process Implementation
+**Fact Table**:
+- `fact_sales`: Central table containing sales metrics and foreign keys
 
-#### Extract
-- Data retrieval from source systems
-- Connection management and data validation
+**Dimension Tables**:
+- `dim_customers`: Customer demographics and attributes
+- `dim_products`: Product category information
+- `dim_date`: Date hierarchy for temporal analysis
 
-#### Transform
-- **Data Cleaning**: Handling missing values, duplicates, and inconsistencies
-- **Data Enrichment**: Deriving new calculated columns
-- **Data Type Conversion**: Ensuring proper data types for analysis
-- **Data Integration**: Joining multiple data sources
-- **Deduplication**: Removing duplicate records
+**Staging Table**:
+- `staging_retail_sales`: Temporary storage for data transformation
 
-#### Load
-- **Dimension Loading**: Insert new records with optional update capabilities
-- **Fact Table Loading**: Insert-only approach for historical data preservation
-- **Data Validation**: Ensuring data integrity and consistency
+## ETL Pipeline Implementation
 
-### 4. Business Intelligence & Analytics
+### Extract (`etl/extract.py`)
+- Reads CSV data using pandas with proper delimiter handling
+- Implements error handling for file operations
+- Returns structured DataFrame for downstream processing
 
-The data warehouse enables answering critical business questions through optimized queries:
+### Transform (`etl/transform.py`)
+- **Column Standardization**: Renames columns to snake_case convention
+- **Data Type Conversion**: Ensures proper data types for all fields
+- **Date Parsing**: Converts date strings to datetime objects
+- **Data Cleaning**: Removes duplicates and handles missing values
+- **Data Validation**: Maintains data integrity throughout transformation
 
-- 📈 **Sales Performance**: "What are the top 5 products by sales volume?"
-- 👥 **Customer Analysis**: "Which customers have the highest purchase volume this year?"
-- 📅 **Trend Analysis**: "How have sales trends evolved month-over-month?"
+### Load (`etl/load.py`)
+- Uses SQLAlchemy for database connectivity
+- Implements staging table approach for data loading
+- Provides error handling and transaction management
+- Supports PostgreSQL database backend
 
-## Project Deliverables
+## 🛠️ Technology Stack
 
-### Part 1: Documentation 📚
-- [ ] **Dataset Description**: Comprehensive source system documentation
-- [ ] **Schema Design Diagram**: Visual representation of data warehouse architecture
-- [ ] **ETL Process Documentation**: Detailed workflow descriptions
-
-### Part 2: Implementation 🔧
-- [ ] **ETL Pipeline Screenshots**: Visual evidence of SSIS packages or alternative tools
-- [ ] **Database Population Evidence**: Screenshots of populated fact and dimension tables
-- [ ] **Data Quality Validation**: Evidence of successful data loading
-
-### Part 3: Business Intelligence Evidence 📊
-- [ ] **Query Demonstrations**: Screenshots of business question queries and results
-- [ ] **Performance Metrics**: Query execution times and optimization evidence
-- [ ] **Business Insights**: Analysis and interpretation of query results
+- **Python 3.13+**: Core programming language
+- **pandas**: Data manipulation and analysis
+- **SQLAlchemy**: Database ORM and connection management
+- **psycopg2**: PostgreSQL database adapter
+- **PostgreSQL**: Data warehouse database
+- **UV**: Modern Python package management
 
 ## 📁 Project Structure
 
 ```
-Parcial 3/
-├── README.md
-├── scripts/
-├── documentation/
-├── schemas/
-├── screenshots/
-└── queries/
+Parcial 3 - Bodegas/
+├── README.md                     # Project documentation
+├── pyproject.toml               # Python project configuration
+├── uv.lock                      # Dependency lock file
+│
+├── data/
+│   ├── raw/
+│   │   └── retail_sales_dataset.csv    # Source dataset
+│   └── processed/                       # Transformed data outputs
+│
+├── docs/
+│   └── Star schema diagram.png         # Data warehouse schema diagram
+│
+├── etl/
+│   ├── extract.py                      # Data extraction module
+│   ├── transform.py                    # Data transformation module
+│   └── load.py                         # Data loading module
+│
+├── pipelines/
+│   ├── driver.py                       # Simple ETL orchestration script
+│   └── airflow_dag.py                  # Apache Airflow DAG definition
+│
+└── sql/
+    ├── create_tables.sql               # Database schema definitions
+    ├── transformations.sql             # Data transformation queries
+    └── queries.sql                     # Business intelligence queries
 ```
 
----
+## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.13+
+- PostgreSQL database
+- UV package manager
+
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   uv sync
+   ```
+
+### Database Setup
+1. Create PostgreSQL database: `parcial3_bodegas`
+2. Run table creation script:
+   ```sql
+   \i sql/create_tables.sql
+   ```
+
+### Running the ETL Pipeline
+
+#### Option 1: Manual Execution
+1. **Extract**: Run `python etl/extract.py`
+2. **Transform**: Run `python etl/transform.py`
+3. **Load**: Run `python etl/load.py`
+4. **Transform Data**: Execute `sql/transformations.sql` in PostgreSQL
+
+#### Option 2: Orchestrated Pipeline (Recommended)
+Run the complete pipeline with the driver script:
+```bash
+python pipelines/driver.py
+```
+
+#### Option 3: Apache Airflow (Production)
+For production-ready scheduling and monitoring:
+
+1. **Install Airflow dependencies**:
+   ```bash
+   uv sync --extra airflow
+   ```
+
+2. **Setup Airflow**:
+   ```bash
+   bash setup_airflow.sh
+   ```
+
+3. **Start Airflow services**:
+   ```bash
+   # Terminal 1 - Scheduler
+   export AIRFLOW_HOME=$(pwd)/airflow
+   airflow scheduler
+   
+   # Terminal 2 - Webserver  
+   airflow webserver --port 8080
+   ```
+
+4. **Access Airflow UI**: http://localhost:8080 (admin/admin)
