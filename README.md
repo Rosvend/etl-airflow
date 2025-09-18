@@ -36,6 +36,8 @@ The implementation follows a **star schema** pattern optimized for analytical qu
 **Staging Table**:
 - `staging_retail_sales`: Temporary storage for data transformation
 
+![alt text](https://github.com/rosvend/retail-sales-etl-pipeline/docs/Star schema diagram.png "Star schema modeling")
+
 ## ETL Pipeline Implementation
 
 ### Extract (`etl/extract.py`)
